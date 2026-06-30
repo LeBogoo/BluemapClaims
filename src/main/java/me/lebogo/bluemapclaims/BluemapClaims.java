@@ -57,16 +57,24 @@ public final class BluemapClaims extends JavaPlugin {
 
         Collection<BlueMapWorld> worlds = blueMapAPI.getWorlds();
         for (BlueMapWorld world : worlds) {
-            String worldName = world.getId().split("#")[0];
+            String worldName = world.getId();
             blueMapWorlds.put(worldName, world);
+	    //logger.info("BlueMap world ID: '" + world.getId() + "' -> key: '" + worldName + "'");
         }
 
         Map<String, List<Claim>> claimsByWorld = new HashMap<>();
 
         for (Claim claim : claims) {
             World world = claim.getLesserBoundaryCorner().getWorld();
-            assert world != null;
-            String name = world.getName();
+            if (world == null) continue;
+            String dimension;
+	    switch (world.getEnvironment()) {
+    		case NETHER:  dimension = "minecraft:the_nether"; break;
+    		case THE_END: dimension = "minecraft:the_end";    break;
+    		default:      dimension = "minecraft:overworld";  break;
+	    }
+	    String name = "world#" + dimension;
+	    //logger.info("Claim world name: '" + name + "' environment: '" + world.getEnvironment() + "'");
 
             List<Claim> claimsInWorld = claimsByWorld.computeIfAbsent(name, k -> new ArrayList<>());
             claimsInWorld.add(claim);
@@ -85,7 +93,9 @@ public final class BluemapClaims extends JavaPlugin {
                     int lowestY = -64;
                     int highestY = 320;
 
-                    Color outlineColor = getColorFromName(claim.getOwnerName());
+                    String ownerName = claim.getOwnerName();
+		    if (ownerName == null) ownerName = "Unknown";
+		    Color outlineColor = getColorFromName(ownerName);
                     Color mainColor = new Color((int) (outlineColor.getRed() * 0.9), (int) (outlineColor.getGreen() * 0.9), (int) (outlineColor.getBlue() * 0.9), 0.2f);
 
                     Marker claimMarker = ExtrudeMarker.builder()
@@ -98,7 +108,7 @@ public final class BluemapClaims extends JavaPlugin {
                                     .addPoint(new Vector2d(claim.getGreaterBoundaryCorner().getX() + 1, claim.getGreaterBoundaryCorner().getZ() + 1))
                                     .addPoint(new Vector2d(claim.getGreaterBoundaryCorner().getX() + 1, claim.getLesserBoundaryCorner().getZ()))
                                     .build(), (float) lowestY, (float) highestY)
-                            .label(claim.getOwnerName() + "'s claim")
+                            .label(ownerName + "'s claim")
                             .build();
 
 
