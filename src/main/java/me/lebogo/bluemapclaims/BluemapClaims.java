@@ -57,7 +57,7 @@ public final class BluemapClaims extends JavaPlugin {
 
         Collection<BlueMapWorld> worlds = blueMapAPI.getWorlds();
         for (BlueMapWorld world : worlds) {
-            String worldName = world.getId().split("#")[0];
+            String worldName = world.getId().split("#")[1];
             blueMapWorlds.put(worldName, world);
         }
 
@@ -65,8 +65,9 @@ public final class BluemapClaims extends JavaPlugin {
 
         for (Claim claim : claims) {
             World world = claim.getLesserBoundaryCorner().getWorld();
-            assert world != null;
-            String name = world.getName();
+
+            if (world == null) continue;
+            String name = world.getKey().toString();
 
             List<Claim> claimsInWorld = claimsByWorld.computeIfAbsent(name, k -> new ArrayList<>());
             claimsInWorld.add(claim);

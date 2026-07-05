@@ -1,5 +1,5 @@
 name: BluemapClaims
-version: '1.0-SNAPSHOT'
+version: '${version}'
 main: me.lebogo.bluemapclaims.BluemapClaims
 api-version: '1.21'
 depend: [ BlueMap, GriefPrevention ]
